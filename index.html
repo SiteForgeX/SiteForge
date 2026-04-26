@@ -198,13 +198,12 @@ function openWebs() {
     let div = document.createElement("div");
     div.className = "web";
 
-    div.innerHTML = `
-      ${site.name} 
-      <span class="${site.premium ? 'paid' : 'free'}">
-        (${site.premium ? 'Premium' : 'Free'})
-      </span>
-    `;
-
+div.innerHTML = `
+  <strong>${site.name}</strong><br>
+  <button onclick='previewSite(${JSON.stringify(site.content)})'>
+    Ver sitio 👁
+  </button>
+`;
     list.appendChild(div);
   });
 
@@ -213,6 +212,10 @@ function openWebs() {
 
 function closeModal() {
   document.getElementById("modal").style.display = "none";
+}
+  function previewSite(content) {
+  let win = window.open();
+  win.document.write("<html><body>" + content + "</body></html>");
 }
 </script>
 
