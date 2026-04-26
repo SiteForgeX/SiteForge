@@ -188,20 +188,21 @@ function preview() {
 // ===============================
 
 function publish() {
-  let name = document.getElementById("title").value || "mi-pagina";
+  let name = document.getElementById("title").value || "mi-sitio";
 
-  let page = `
-    <html>
-    <head><title>${name}</title></head>
-    <body>${generateHTML()}</body>
-    </html>
-  `;
+  let content = generateHTML();
 
-  let blob = new Blob([page], { type: "text/html" });
-  let link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = name + ".html";
-  link.click();
+  let sites = JSON.parse(localStorage.getItem("sites")) || [];
+
+  sites.push({
+    name: name,
+    premium: false,
+    content: content
+  });
+
+  localStorage.setItem("sites", JSON.stringify(sites));
+
+  alert("Sitio guardado correctamente ✅");
 }
 
 // ===============================
