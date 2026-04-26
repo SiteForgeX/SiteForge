@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,172 +11,211 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: Arial;
 }
 
 body {
   height: 100vh;
   overflow: hidden;
+  color: white;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
-  position: relative;
+  background: black;
 }
 
-/* Fondo de cuadrados */
-.background {
+/* Fondo animado */
+.bg {
   position: absolute;
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   z-index: -1;
 }
 
-.square {
-  width: 100%;
-  height: 100%;
-  animation: move 10s infinite alternate;
+.bg div {
+  height: 100vh;
+  animation: pulse 6s infinite alternate;
 }
 
-.square:nth-child(1) { background: #ff4d4d; }
-.square:nth-child(2) { background: #4da6ff; }
-.square:nth-child(3) { background: #66ff66; }
-.square:nth-child(4) { background: #ffcc00; }
-.square:nth-child(5) { background: #cc66ff; }
-.square:nth-child(6) { background: #ff944d; }
+.bg div:nth-child(odd) { background: #111; }
+.bg div:nth-child(even) { background: #222; }
 
-.square:nth-child(7) { background: #ff4d4d; }
-.square:nth-child(8) { background: #4da6ff; }
-.square:nth-child(9) { background: #66ff66; }
-.square:nth-child(10) { background: #ffcc00; }
-.square:nth-child(11) { background: #cc66ff; }
-.square:nth-child(12) { background: #ff944d; }
-
-.square:nth-child(13) { background: #ff4d4d; }
-.square:nth-child(14) { background: #4da6ff; }
-.square:nth-child(15) { background: #66ff66; }
-.square:nth-child(16) { background: #ffcc00; }
-.square:nth-child(17) { background: #cc66ff; }
-.square:nth-child(18) { background: #ff944d; }
-
-.square:nth-child(19) { background: #ff4d4d; }
-.square:nth-child(20) { background: #4da6ff; }
-.square:nth-child(21) { background: #66ff66; }
-.square:nth-child(22) { background: #ffcc00; }
-.square:nth-child(23) { background: #cc66ff; }
-.square:nth-child(24) { background: #ff944d; }
-
-.square:nth-child(25) { background: #ff4d4d; }
-.square:nth-child(26) { background: #4da6ff; }
-.square:nth-child(27) { background: #66ff66; }
-.square:nth-child(28) { background: #ffcc00; }
-.square:nth-child(29) { background: #cc66ff; }
-.square:nth-child(30) { background: #ff944d; }
-
-.square:nth-child(31) { background: #ff4d4d; }
-.square:nth-child(32) { background: #4da6ff; }
-.square:nth-child(33) { background: #66ff66; }
-.square:nth-child(34) { background: #ffcc00; }
-.square:nth-child(35) { background: #cc66ff; }
-.square:nth-child(36) { background: #ff944d; }
-
-@keyframes move {
-  from { transform: scale(1); }
-  to { transform: scale(1.1); }
+@keyframes pulse {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
 }
 
-/* Contenido principal */
+/* Contenedor */
 .container {
   text-align: center;
-  backdrop-filter: blur(10px);
-  padding: 40px;
-  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  padding: 50px;
+  border-radius: 25px;
 }
 
 /* Título */
 h1 {
-  font-size: 60px;
+  font-size: 70px;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  opacity: 0.7;
   margin-bottom: 40px;
 }
 
 /* Botones */
 .btn {
-  display: inline-block;
-  padding: 15px 30px;
-  margin: 10px;
-  font-size: 18px;
+  display: block;
+  width: 260px;
+  margin: 10px auto;
+  padding: 15px;
   border-radius: 12px;
+  font-size: 18px;
   cursor: pointer;
-  transition: 0.3s;
   border: none;
+  transition: 0.3s;
 }
 
-/* Botón normal */
+.btn:hover {
+  transform: scale(1.05);
+}
+
+/* Botón principal */
 .create {
-  background: rgba(0,0,0,0.5);
+  background: #333;
   color: white;
 }
 
-.create:hover {
-  transform: scale(1.1);
-  background: rgba(0,0,0,0.7);
-}
-
-/* Botón premium */
+/* Premium */
 .premium {
-  background: #FFD700;
+  background: gold;
   color: white;
   font-weight: bold;
 }
 
-.premium:hover {
-  transform: scale(1.1);
-  background: #e6c200;
+/* Mis webs */
+.mywebs {
+  background: #555;
+  color: white;
 }
 
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #111;
+  padding: 20px;
+  border-radius: 15px;
+  width: 300px;
+}
+
+.web {
+  background: #222;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+}
+
+.free { color: lightgreen; }
+.paid { color: gold; }
+
+.support {
+  margin-top: 30px;
+  font-size: 13px;
+  opacity: 0.7;
+}
 </style>
 </head>
 
 <body>
 
-<div class="background">
-  <!-- 36 cuadrados -->
-  <!-- Puedes duplicar si quieres más -->
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-
-  <div class="square"></div><div class="square"></div><div class="square"></div>
-  <div class="square"></div><div class="square"></div><div class="square"></div>
+<div class="bg">
+  <div></div><div></div><div></div><div></div>
+  <div></div><div></div><div></div><div></div>
 </div>
 
 <div class="container">
   <h1>SiteForge</h1>
+  <p class="subtitle">Create your website in seconds</p>
 
-  <button class="btn create" onclick="location.href='editor.html'">
+  <button class="btn create" onclick="goEditor()">
     🚀 Create a Site +
   </button>
 
-  <button class="btn premium">
+  <button class="btn premium" onclick="premiumAlert()">
     ⭐ Create Premium Site
   </button>
-  <p class="support">Support: Hyisx98754@gmail.com/p>
+
+  <button class="btn mywebs" onclick="openWebs()">
+    📂 View My Sites
+  </button>
+
+  <p class="support">Support: Hyisx98754@GMAIL.COM</p>
 </div>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>My Sites</h3>
+    <div id="list"></div>
+    <button onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+// SIMULACIÓN DE DATOS
+let sites = JSON.parse(localStorage.getItem("sites")) || [
+  { name: "Mi negocio", premium: false },
+  { name: "Tienda pro", premium: true }
+];
+
+function goEditor() {
+  window.location.href = "editor.html";
+}
+
+function premiumAlert() {
+  alert("Premium desbloquea funciones exclusivas 💰");
+}
+
+function openWebs() {
+  let list = document.getElementById("list");
+  list.innerHTML = "";
+
+  sites.forEach(site => {
+    let div = document.createElement("div");
+    div.className = "web";
+
+    div.innerHTML = `
+      ${site.name} 
+      <span class="${site.premium ? 'paid' : 'free'}">
+        (${site.premium ? 'Premium' : 'Free'})
+      </span>
+    `;
+
+    list.appendChild(div);
+  });
+
+  document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+}
+</script>
 
 </body>
 </html>
-
+```
