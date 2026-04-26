@@ -1,41 +1,65 @@
-```javascript
+javascript id="improved-appjs"
+// ==========================
+// STATE
+// ==========================
 let blocks = [];
 
-/* RENDER */
+// ==========================
+// RENDER
+// ==========================
 function render() {
-  let canvas = document.getElementById("canvas");
+  const canvas = document.getElementById("canvas");
   canvas.innerHTML = "";
 
   blocks.forEach((block, index) => {
-    let div = document.createElement("div");
+    const div = document.createElement("div");
     div.className = "block";
 
     let content;
 
+    // -------- TEXT --------
     if (block.type === "text") {
       content = document.createElement("p");
       content.innerText = block.data;
     }
 
+    // -------- IMAGE --------
     if (block.type === "image") {
       content = document.createElement("img");
       content.src = block.data;
       content.style.maxWidth = "100%";
     }
 
+    // -------- BUTTON --------
     if (block.type === "button") {
       content = document.createElement("button");
       content.innerText = block.data.text;
 
       content.onclick = () => {
+        const action = block.data.action || "";
+
+        if (!action) {
+          alert("No action assigned");
+          return;
+        }
+
+        // LINK
+        if (action.startsWith("http")) {
+          window.open(action, "_blank");
+          return;
+        }
+
+        // JS
         try {
-          eval(block.data.action);
-        } catch {
-          window.location.href = block.data.action;
+          new Function(action)();
+        } catch (e) {
+          console.error(e);
+          alert("Invalid script");
         }
       };
     }
 
+    // -------- HTML --------
     if (block.type === "html") {
       content = document.createElement("div");
       content.innerHTML = block.data;
@@ -43,22 +67,44 @@ function render() {
 
     div.appendChild(content);
 
-    // eliminar bloque
-    let del = document.createElement("button");
+    // ==========================
+    // CONTROLS
+    // ==========================
+
+    // EDIT
+    const edit = document.createElement("button");
+    edit.innerText = "✏️";
+    edit.onclick = () => editBlock(index);
+    div.appendChild(edit);
+
+    // DELETE
+    const del = document.createElement("button");
     del.innerText = "❌";
     del.onclick = () => {
       blocks.splice(index, 1);
       render();
     };
-
     div.appendChild(del);
+
+    // MOVE UP
+    const up = document.createElement("button");
+    up.innerText = "⬆️";
+    up.onclick = () => moveBlock(index, -1);
+    div.appendChild(up);
+
+    // MOVE DOWN
+    const down = document.createElement("button");
+    down.innerText = "⬇️";
+    down.onclick = () => moveBlock(index, 1);
+    div.appendChild(down);
 
     canvas.appendChild(div);
   });
 }
 
-/* FUNCIONES */
-
+// ==========================
+// ADD FUNCTIONS
+// ==========================
 function addText() {
   let text = prompt("Write text:");
   if (!text) return;
@@ -77,9 +123,10 @@ function addImage() {
 
 function addButton() {
   let text = prompt("Button text:");
-  let action = prompt("Link or JS:");
-
   if (!text) return;
+
+  let action = prompt("Action (link or JS):");
+  if (!action) action = "";
 
   blocks.push({
     type: "button",
@@ -97,8 +144,52 @@ function addHTML() {
   render();
 }
 
-/* SAVE */
+// ==========================
+// EDIT BLOCK
+// ==========================
+function editBlock(index) {
+  const block = blocks[index];
 
+  if (block.type === "text") {
+    let newText = prompt("Edit text:", block.data);
+    if (newText !== null) block.data = newText;
+  }
+
+  if (block.type === "image") {
+    let newUrl = prompt("Edit image URL:", block.data);
+    if (newUrl !== null) block.data = newUrl;
+  }
+
+  if (block.type === "button") {
+    let newText = prompt("Edit button text:", block.data.text);
+    let newAction = prompt("Edit action:", block.data.action);
+
+    if (newText !== null) block.data.text = newText;
+    if (newAction !== null) block.data.action = newAction;
+  }
+
+  if (block.type === "html") {
+    let newHtml = prompt("Edit HTML:", block.data);
+    if (newHtml !== null) block.data = newHtml;
+  }
+
+  render();
+}
+
+// ==========================
+// MOVE BLOCKS
+// ==========================
+function moveBlock(index, direction) {
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= blocks.length) return;
+
+  [blocks[index], blocks[newIndex]] = [blocks[newIndex], blocks[index]];
+  render();
+}
+
+// ==========================
+// GENERATE HTML
+// ==========================
 function generateHTML() {
   let html = "";
 
@@ -113,10 +204,14 @@ function generateHTML() {
 
     if (block.type === "button") {
       html += `
-      <button onclick="
-        try{eval('${block.data.action}')}
-        catch{window.location='${block.data.action}'}
-      ">${block.data.text}</button>`;
+<button onclick="
+if('${block.data.action}'.startsWith('http')){
+  window.open('${block.data.action}')
+}else{
+  try{new Function('${block.data.action}')()}
+  catch{alert('Error')}
+}
+">${block.data.text}</button>`;
     }
 
     if (block.type === "html") {
@@ -127,6 +222,9 @@ function generateHTML() {
   return html;
 }
 
+// ==========================
+// SAVE
+// ==========================
 function save() {
   let name = prompt("Site name:");
   if (!name) return;
@@ -145,16 +243,16 @@ function save() {
 
   localStorage.setItem("sites", JSON.stringify(sites));
 
-  alert("Saved ✅");
+  alert("Saved successfully ✅");
 }
 
-/* CLEAR */
-
+// ==========================
+// CLEAR
+// ==========================
 function clearCanvas() {
   if (confirm("Clear everything?")) {
     blocks = [];
     render();
   }
 }
-
 
