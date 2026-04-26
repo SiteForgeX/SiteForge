@@ -1,210 +1,34 @@
-```html
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Editor - SiteForge</title>
+<title>Editor</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  display: flex;
-  height: 100vh;
-}
-
-/* Sidebar */
-.sidebar {
-  width: 250px;
-  background: #111;
-  color: white;
-  padding: 20px;
-}
-
-.sidebar h2 {
-  margin-bottom: 20px;
-}
-
-.sidebar button {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 10px;
-  border: none;
-  background: #222;
-  color: white;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-.sidebar button:hover {
-  background: #444;
-}
-
-/* Editor area */
-.editor {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Topbar */
-.topbar {
-  background: #f5f5f5;
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.topbar input {
-  padding: 8px;
-  width: 200px;
-}
-
-.topbar button {
-  padding: 8px 12px;
-  margin-left: 5px;
-  cursor: pointer;
-}
-
-/* Canvas */
-.canvas {
-  flex: 1;
-  padding: 20px;
-  overflow: auto;
-  background: #fafafa;
-}
-
-.block {
-  border: 1px dashed #ccc;
-  padding: 15px;
-  margin-bottom: 10px;
-  background: white;
-}
-
-/* Buttons */
-.publish {
-  background: green;
-  color: white;
-  border: none;
-}
-
-.preview {
-  background: blue;
-  color: white;
-  border: none;
-}
+body { margin:0; display:flex; font-family:Arial; }
+.sidebar { width:200px; background:#111; color:white; padding:10px; }
+.sidebar button { width:100%; margin:5px 0; }
+.canvas { flex:1; padding:20px; background:#f5f5f5; }
+.block { border:1px dashed #aaa; padding:10px; margin:10px 0; background:white; }
 </style>
 </head>
 
 <body>
 
 <div class="sidebar">
-  <h2>SiteForge</h2>
-
-  <button onclick="addText()">➕ Texto</button>
-  <button onclick="addImage()">🖼 Imagen</button>
-  <button onclick="addButton()">🔘 Botón</button>
-  <button onclick="addWhatsapp()">💬 WhatsApp</button>
+  <h3>SiteForge</h3>
+  <button onclick="addText()">Texto</button>
+  <button onclick="addImage()">Imagen</button>
+  <button onclick="addButton()">Botón</button>
+  <button onclick="addHTML()">HTML</button>
+  <button onclick="save()">Guardar</button>
 </div>
 
-<div class="editor">
-  
-  <div class="topbar">
-    <input id="title" placeholder="Nombre de tu página">
-    
-    <div>
-      <button class="preview" onclick="preview()">👁 Preview</button>
-      <button class="publish" onclick="publish()">🚀 Publicar</button>
-    </div>
-  </div>
+<div class="canvas" id="canvas"></div>
 
-  <div class="canvas" id="canvas"></div>
-
-</div>
-
-<script>
-function addText() {
-  let div = document.createElement("div");
-  div.className = "block";
-  div.contentEditable = true;
-  div.innerText = "Escribe texto...";
-  document.getElementById("canvas").appendChild(div);
-}
-
-function addImage() {
-  let url = prompt("URL de la imagen:");
-  if (!url) return;
-
-  let img = document.createElement("img");
-  img.src = url;
-  img.style.maxWidth = "100%";
-
-  let div = document.createElement("div");
-  div.className = "block";
-  div.appendChild(img);
-
-  document.getElementById("canvas").appendChild(div);
-}
-
-function addButton() {
-  let text = prompt("Texto del botón:");
-  if (!text) return;
-
-  let btn = document.createElement("button");
-  btn.innerText = text;
-
-  let div = document.createElement("div");
-  div.className = "block";
-  div.appendChild(btn);
-
-  document.getElementById("canvas").appendChild(div);
-}
-
-function addWhatsapp() {
-  let number = prompt("Número de WhatsApp:");
-  if (!number) return;
-
-  let link = document.createElement("a");
-  link.href = "https://wa.me/" + number;
-  link.innerText = "Contactar por WhatsApp";
-  link.style.display = "inline-block";
-  link.style.padding = "10px";
-  link.style.background = "green";
-  link.style.color = "white";
-
-  let div = document.createElement("div");
-  div.className = "block";
-  div.appendChild(link);
-
-  document.getElementById("canvas").appendChild(div);
-}
-
-function preview() {
-  let content = document.getElementById("canvas").innerHTML;
-  let win = window.open();
-  win.document.write("<html><body>" + content + "</body></html>");
-}
-
-function publish() {
-  let name = document.getElementById("title").value || "mi-pagina";
-  let content = document.getElementById("canvas").innerHTML;
-
-  let page = `
-    <html>
-    <head><title>${name}</title></head>
-    <body>${content}</body>
-    </html>
-  `;
-
-  let blob = new Blob([page], { type: "text/html" });
-  let link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = name + ".html";
-  link.click();
-}
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
-```
+
+
