@@ -1,229 +1,71 @@
 ```javascript
-// ===============================
-// SiteForge - App.js PRO
-// ===============================
+let blocks=[];
 
-// Estado global
-let state = {
-  title: "",
-  blocks: []
-};
-
-// ===============================
-// UTILIDADES
-// ===============================
-function generateId() {
-  return "id-" + Math.random().toString(36).substr(2, 9);
-}
-
-function saveToLocal() {
-  localStorage.setItem("siteforge-data", JSON.stringify(state));
-}
-
-function loadFromLocal() {
-  let data = localStorage.getItem("siteforge-data");
-  if (data) {
-    state = JSON.parse(data);
-    render();
-  }
-}
-
-// ===============================
-// BLOQUES
-// ===============================
-
-function addBlock(type, content = {}) {
-  let block = {
-    id: generateId(),
-    type: type,
-    content: content
-  };
-
-  state.blocks.push(block);
+// agregar texto
+function addText(){
+  let text=prompt("Texto:");
+  if(!text)return;
+  blocks.push(`<p>${text}</p>`);
   render();
-  saveToLocal();
 }
 
-function deleteBlock(id) {
-  state.blocks = state.blocks.filter(b => b.id !== id);
+// imagen
+function addImage(){
+  let url=prompt("URL:");
+  if(!url)return;
+  blocks.push(`<img src="${url}" style="max-width:100%">`);
   render();
-  saveToLocal();
 }
 
-// ===============================
-// RENDER
-// ===============================
+// botón avanzado
+function addButton(){
+  let text=prompt("Texto botón:");
+  let action=prompt("Link o JS:");
 
-function render() {
-  let canvas = document.getElementById("canvas");
-  canvas.innerHTML = "";
+  if(!text)return;
 
-  state.blocks.forEach(block => {
-    let el = createElement(block);
-    canvas.appendChild(el);
-  });
+  let btn = `
+  <button onclick="
+    try{eval('${action}')}
+    catch{window.location='${action}'}
+  ">${text}</button>
+  `;
+
+  blocks.push(btn);
+  render();
 }
 
-function createElement(block) {
-  let div = document.createElement("div");
-  div.className = "block";
-  div.dataset.id = block.id;
+// HTML libre (esto lo hace poderoso)
+function addHTML(){
+  let html=prompt("Pega código HTML:");
+  if(!html)return;
+  blocks.push(html);
+  render();
+}
 
-  let content;
+function render(){
+  document.getElementById("canvas").innerHTML=blocks.join("");
+}
 
-  switch (block.type) {
-    case "text":
-      content = document.createElement("div");
-      content.contentEditable = true;
-      content.innerText = block.content.text || "Texto...";
-      content.oninput = () => {
-        block.content.text = content.innerText;
-        saveToLocal();
-      };
-      break;
+// guardar
+function save(){
+  let name=prompt("Nombre del sitio:");
+  if(!name)return;
 
-    case "image":
-      content = document.createElement("img");
-      content.src = block.content.url;
-      content.style.maxWidth = "100%";
-      break;
+  let sites=JSON.parse(localStorage.getItem("sites"))||[];
 
-    case "button":
-      content = document.createElement("button");
-      content.innerText = block.content.text || "Botón";
-      break;
+  let content=blocks.join("");
 
-    case "whatsapp":
-      content = document.createElement("a");
-      content.href = "https://wa.me/" + block.content.number;
-      content.innerText = "Contactar por WhatsApp";
-      content.style.background = "green";
-      content.style.color = "white";
-      content.style.padding = "10px";
-      content.style.display = "inline-block";
-      break;
+  let existing=sites.find(s=>s.name===name);
 
-    default:
-      content = document.createElement("div");
-      content.innerText = "Bloque desconocido";
+  if(existing){
+    existing.content=content;
+  } else {
+    sites.push({name,content});
   }
 
-  // Botón eliminar
-  let del = document.createElement("button");
-  del.innerText = "❌";
-  del.style.float = "right";
-  del.onclick = () => deleteBlock(block.id);
+  localStorage.setItem("sites",JSON.stringify(sites));
 
-  div.appendChild(del);
-  div.appendChild(content);
-
-  return div;
+  alert("Guardado ✅");
 }
-
-// ===============================
-// FUNCIONES DE UI
-// ===============================
-
-function addText() {
-  addBlock("text", { text: "Nuevo texto..." });
-}
-
-function addImage() {
-  let url = prompt("URL de imagen:");
-  if (!url) return;
-  addBlock("image", { url });
-}
-
-function addButton() {
-  let text = prompt("Texto del botón:");
-  if (!text) return;
-  addBlock("button", { text });
-}
-
-function addWhatsapp() {
-  let number = prompt("Número:");
-  if (!number) return;
-  addBlock("whatsapp", { number });
-}
-
-// ===============================
-// PREVIEW
-// ===============================
-
-function generateHTML() {
-  let html = "";
-
-  state.blocks.forEach(block => {
-    switch (block.type) {
-      case "text":
-        html += `<p>${block.content.text}</p>`;
-        break;
-      case "image":
-        html += `<img src="${block.content.url}" style="max-width:100%">`;
-        break;
-      case "button":
-        html += `<button>${block.content.text}</button>`;
-        break;
-      case "whatsapp":
-        html += `<a href="https://wa.me/${block.content.number}">WhatsApp</a>`;
-        break;
-    }
-  });
-
-  return html;
-}
-
-function preview() {
-  let win = window.open();
-  win.document.write(`
-    <html>
-    <head><title>Preview</title></head>
-    <body>${generateHTML()}</body>
-    </html>
-  `);
-}
-
-// ===============================
-// PUBLICAR (EXPORTAR)
-// ===============================
-
-function publish() {
-  let name = document.getElementById("title").value || "mi-sitio";
-
-  let content = generateHTML();
-
-  let sites = JSON.parse(localStorage.getItem("sites")) || [];
-
-  sites.push({
-    name: name,
-    premium: false,
-    content: content
-  });
-
-  localStorage.setItem("sites", JSON.stringify(sites));
-
-  alert("Sitio guardado correctamente ✅");
-}
-
-// ===============================
-// AUTO GUARDADO
-// ===============================
-
-setInterval(() => {
-  saveToLocal();
-}, 3000);
-
-// ===============================
-// INIT
-// ===============================
-
-window.onload = () => {
-  loadFromLocal();
-
-  let titleInput = document.getElementById("title");
-  titleInput.oninput = () => {
-    state.title = titleInput.value;
-    saveToLocal();
-  };
-};
 ```
