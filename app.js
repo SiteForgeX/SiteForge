@@ -1,71 +1,160 @@
 ```javascript
-let blocks=[];
+let blocks = [];
 
-// agregar texto
-function addText(){
-  let text=prompt("Texto:");
-  if(!text)return;
-  blocks.push(`<p>${text}</p>`);
+/* RENDER */
+function render() {
+  let canvas = document.getElementById("canvas");
+  canvas.innerHTML = "";
+
+  blocks.forEach((block, index) => {
+    let div = document.createElement("div");
+    div.className = "block";
+
+    let content;
+
+    if (block.type === "text") {
+      content = document.createElement("p");
+      content.innerText = block.data;
+    }
+
+    if (block.type === "image") {
+      content = document.createElement("img");
+      content.src = block.data;
+      content.style.maxWidth = "100%";
+    }
+
+    if (block.type === "button") {
+      content = document.createElement("button");
+      content.innerText = block.data.text;
+
+      content.onclick = () => {
+        try {
+          eval(block.data.action);
+        } catch {
+          window.location.href = block.data.action;
+        }
+      };
+    }
+
+    if (block.type === "html") {
+      content = document.createElement("div");
+      content.innerHTML = block.data;
+    }
+
+    div.appendChild(content);
+
+    // eliminar bloque
+    let del = document.createElement("button");
+    del.innerText = "❌";
+    del.onclick = () => {
+      blocks.splice(index, 1);
+      render();
+    };
+
+    div.appendChild(del);
+
+    canvas.appendChild(div);
+  });
+}
+
+/* FUNCIONES */
+
+function addText() {
+  let text = prompt("Write text:");
+  if (!text) return;
+
+  blocks.push({ type: "text", data: text });
   render();
 }
 
-// imagen
-function addImage(){
-  let url=prompt("URL:");
-  if(!url)return;
-  blocks.push(`<img src="${url}" style="max-width:100%">`);
+function addImage() {
+  let url = prompt("Image URL:");
+  if (!url) return;
+
+  blocks.push({ type: "image", data: url });
   render();
 }
 
-// botón avanzado
-function addButton(){
-  let text=prompt("Texto botón:");
-  let action=prompt("Link o JS:");
+function addButton() {
+  let text = prompt("Button text:");
+  let action = prompt("Link or JS:");
 
-  if(!text)return;
+  if (!text) return;
 
-  let btn = `
-  <button onclick="
-    try{eval('${action}')}
-    catch{window.location='${action}'}
-  ">${text}</button>
-  `;
+  blocks.push({
+    type: "button",
+    data: { text, action }
+  });
 
-  blocks.push(btn);
   render();
 }
 
-// HTML libre (esto lo hace poderoso)
-function addHTML(){
-  let html=prompt("Pega código HTML:");
-  if(!html)return;
-  blocks.push(html);
+function addHTML() {
+  let html = prompt("Paste HTML:");
+  if (!html) return;
+
+  blocks.push({ type: "html", data: html });
   render();
 }
 
-function render(){
-  document.getElementById("canvas").innerHTML=blocks.join("");
+/* SAVE */
+
+function generateHTML() {
+  let html = "";
+
+  blocks.forEach(block => {
+    if (block.type === "text") {
+      html += `<p>${block.data}</p>`;
+    }
+
+    if (block.type === "image") {
+      html += `<img src="${block.data}" style="max-width:100%">`;
+    }
+
+    if (block.type === "button") {
+      html += `
+      <button onclick="
+        try{eval('${block.data.action}')}
+        catch{window.location='${block.data.action}'}
+      ">${block.data.text}</button>`;
+    }
+
+    if (block.type === "html") {
+      html += block.data;
+    }
+  });
+
+  return html;
 }
 
-// guardar
-function save(){
-  let name=prompt("Nombre del sitio:");
-  if(!name)return;
+function save() {
+  let name = prompt("Site name:");
+  if (!name) return;
 
-  let sites=JSON.parse(localStorage.getItem("sites"))||[];
+  let content = generateHTML();
 
-  let content=blocks.join("");
+  let sites = JSON.parse(localStorage.getItem("sites")) || [];
 
-  let existing=sites.find(s=>s.name===name);
+  let existing = sites.find(s => s.name === name);
 
-  if(existing){
-    existing.content=content;
+  if (existing) {
+    existing.content = content;
   } else {
-    sites.push({name,content});
+    sites.push({ name, content });
   }
 
-  localStorage.setItem("sites",JSON.stringify(sites));
+  localStorage.setItem("sites", JSON.stringify(sites));
 
-  alert("Guardado ✅");
+  alert("Saved ✅");
 }
-```
+
+/* CLEAR */
+
+function clearCanvas() {
+  if (confirm("Clear everything?")) {
+    blocks = [];
+    render();
+  }
+}
+
+
