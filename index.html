@@ -3,222 +3,135 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SiteForge</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial;
-}
-
 body {
-  height: 100vh;
-  overflow: hidden;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: black;
+  margin:0;
+  font-family: Arial;
+  color:white;
+  text-align:center;
+  overflow:hidden;
 }
 
-/* Fondo animado */
+/* Fondo */
 .bg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  z-index: -1;
+  position:absolute;
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns: repeat(6,1fr);
+  grid-template-rows: repeat(6,1fr);
+  z-index:-1;
 }
+.bg div { width:100%; height:100%; }
+.bg div:nth-child(odd){background:#4da6ff;}
+.bg div:nth-child(even){background:#ff4d4d;}
 
-.bg div {
-  height: 100vh;
-  animation: pulse 6s infinite alternate;
-}
-
-.bg div:nth-child(odd) { background: #111; }
-.bg div:nth-child(even) { background: #222; }
-
-@keyframes pulse {
-  from { opacity: 0.6; }
-  to { opacity: 1; }
-}
-
-/* Contenedor */
+/* UI */
 .container {
-  text-align: center;
-  backdrop-filter: blur(15px);
-  padding: 50px;
-  border-radius: 25px;
+  margin-top:100px;
 }
 
-/* Título */
-h1 {
-  font-size: 70px;
-  margin-bottom: 10px;
+button {
+  padding:15px;
+  margin:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
 }
 
-.subtitle {
-  opacity: 0.7;
-  margin-bottom: 40px;
-}
-
-/* Botones */
-.btn {
-  display: block;
-  width: 260px;
-  margin: 10px auto;
-  padding: 15px;
-  border-radius: 12px;
-  font-size: 18px;
-  cursor: pointer;
-  border: none;
-  transition: 0.3s;
-}
-
-.btn:hover {
-  transform: scale(1.05);
-}
-
-/* Botón principal */
-.create {
-  background: #333;
-  color: white;
-}
-
-/* Premium */
-.premium {
-  background: gold;
-  color: white;
-  font-weight: bold;
-}
-
-/* Mis webs */
-.mywebs {
-  background: #555;
-  color: white;
-}
+.create { background:#333; color:white; }
+.my { background:#555; color:white; }
 
 /* Modal */
 .modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.8);
-  display: none;
-  justify-content: center;
-  align-items: center;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.8);
+  display:none;
 }
-
 .modal-content {
-  background: #111;
-  padding: 20px;
-  border-radius: 15px;
-  width: 300px;
+  background:#111;
+  padding:20px;
+  margin:100px auto;
+  width:300px;
 }
 
-.web {
-  background: #222;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 8px;
-}
-
-.free { color: lightgreen; }
-.paid { color: gold; }
-
-.support {
-  margin-top: 30px;
-  font-size: 13px;
-  opacity: 0.7;
-}
+.web { margin:10px 0; }
 </style>
 </head>
 
 <body>
 
 <div class="bg">
-  <div></div><div></div><div></div><div></div>
-  <div></div><div></div><div></div><div></div>
+  <!-- muchos cuadrados -->
+  <div></div><div></div><div></div><div></div><div></div><div></div>
+  <div></div><div></div><div></div><div></div><div></div><div></div>
+  <div></div><div></div><div></div><div></div><div></div><div></div>
+  <div></div><div></div><div></div><div></div><div></div><div></div>
 </div>
 
 <div class="container">
   <h1>SiteForge</h1>
-  <p class="subtitle">Create your website in seconds</p>
 
-  <button class="btn create" onclick="goEditor()">
-    🚀 Create a Site +
-  </button>
+  <button class="create" onclick="goEditor()">🚀 Crear sitio</button>
+  <button class="my" onclick="openWebs()">📂 Mis sitios</button>
 
-  <button class="btn premium" onclick="premiumAlert()">
-    ⭐ Create Premium Site
-  </button>
-
-  <button class="btn mywebs" onclick="openWebs()">
-    📂 View My Sites
-  </button>
-
-  <p class="support">Support: Hyisx98754@GMAIL.COM</p>
+  <p>Support: Hyisx98754@GMAIL.COM</p>
 </div>
 
-<!-- Modal -->
 <div class="modal" id="modal">
   <div class="modal-content">
-    <h3>My Sites</h3>
+    <h3>Mis sitios</h3>
     <div id="list"></div>
-    <button onclick="closeModal()">Close</button>
+    <button onclick="closeModal()">Cerrar</button>
   </div>
 </div>
 
 <script>
-// SIMULACIÓN DE DATOS
-let sites = JSON.parse(localStorage.getItem("sites")) || [
-  { name: "Mi negocio", premium: false },
-  { name: "Tienda pro", premium: true }
-];
-
-function goEditor() {
-  window.location.href = "editor.html";
+function goEditor(){
+  location.href="editor.html";
 }
 
-function premiumAlert() {
-  alert("Premium desbloquea funciones exclusivas 💰");
-}
-
-function openWebs() {
+function openWebs(){
+  let sites = JSON.parse(localStorage.getItem("sites")) || [];
   let list = document.getElementById("list");
-  list.innerHTML = "";
+  list.innerHTML="";
 
-  sites.forEach(site => {
-    let div = document.createElement("div");
-    div.className = "web";
+  sites.forEach((site,i)=>{
+    let div=document.createElement("div");
+    div.className="web";
 
-div.innerHTML = `
-  <strong>${site.name}</strong><br>
-  <button onclick='previewSite(${JSON.stringify(site.content)})'>
-    Ver sitio 👁
-  </button>
-`;
+    div.innerHTML=`
+      <strong>${site.name}</strong><br>
+      <button onclick='previewSite(${JSON.stringify(site.content)})'>Ver</button>
+      <button onclick='deleteSite(${i})'>Eliminar</button>
+    `;
+
     list.appendChild(div);
   });
 
-  document.getElementById("modal").style.display = "flex";
+  document.getElementById("modal").style.display="block";
 }
 
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
+function previewSite(content){
+  let win=window.open();
+  win.document.write("<html><body>"+content+"</body></html>");
 }
-  function previewSite(content) {
-  let win = window.open();
-  win.document.write("<html><body>" + content + "</body></html>");
+
+function deleteSite(i){
+  let sites = JSON.parse(localStorage.getItem("sites")) || [];
+  sites.splice(i,1);
+  localStorage.setItem("sites",JSON.stringify(sites));
+  openWebs();
+}
+
+function closeModal(){
+  document.getElementById("modal").style.display="none";
 }
 </script>
 
 </body>
 </html>
-
