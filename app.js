@@ -1,8 +1,9 @@
-javascript id="improved-appjs"
+```javascript
 // ==========================
-// STATE
+// CONFIG
 // ==========================
 let blocks = [];
+let isPremium = false; // ← cambia a true si quieres activar premium
 
 // ==========================
 // RENDER
@@ -17,20 +18,26 @@ function render() {
 
     let content;
 
-    // -------- TEXT --------
+    // TEXT
     if (block.type === "text") {
       content = document.createElement("p");
       content.innerText = block.data;
     }
 
-    // -------- IMAGE --------
+    // TITLE
+    if (block.type === "title") {
+      content = document.createElement("h2");
+      content.innerText = block.data;
+    }
+
+    // IMAGE
     if (block.type === "image") {
       content = document.createElement("img");
       content.src = block.data;
       content.style.maxWidth = "100%";
     }
 
-    // -------- BUTTON --------
+    // BUTTON
     if (block.type === "button") {
       content = document.createElement("button");
       content.innerText = block.data.text;
@@ -43,23 +50,32 @@ function render() {
           return;
         }
 
-        // LINK
         if (action.startsWith("http")) {
           window.open(action, "_blank");
-          return;
-        }
-
-        // JS
-        try {
-          new Function(action)();
-        } catch (e) {
-          console.error(e);
-          alert("Invalid script");
+        } else {
+          try {
+            new Function(action)();
+          } catch {
+            alert("Error en script");
+          }
         }
       };
     }
 
-    // -------- HTML --------
+    // VIDEO
+    if (block.type === "video") {
+      content = document.createElement("iframe");
+      content.src = block.data;
+      content.width = "100%";
+      content.height = "200";
+    }
+
+    // DIVIDER
+    if (block.type === "divider") {
+      content = document.createElement("hr");
+    }
+
+    // HTML
     if (block.type === "html") {
       content = document.createElement("div");
       content.innerHTML = block.data;
@@ -68,7 +84,7 @@ function render() {
     div.appendChild(content);
 
     // ==========================
-    // CONTROLS
+    // CONTROLES
     // ==========================
 
     // EDIT
@@ -86,13 +102,12 @@ function render() {
     };
     div.appendChild(del);
 
-    // MOVE UP
+    // MOVE
     const up = document.createElement("button");
     up.innerText = "⬆️";
     up.onclick = () => moveBlock(index, -1);
     div.appendChild(up);
 
-    // MOVE DOWN
     const down = document.createElement("button");
     down.innerText = "⬇️";
     down.onclick = () => moveBlock(index, 1);
@@ -103,29 +118,34 @@ function render() {
 }
 
 // ==========================
-// ADD FUNCTIONS
+// ADD
 // ==========================
 function addText() {
-  let text = prompt("Write text:");
+  let text = prompt("Texto:");
   if (!text) return;
-
   blocks.push({ type: "text", data: text });
   render();
 }
 
-function addImage() {
-  let url = prompt("Image URL:");
-  if (!url) return;
+function addTitle() {
+  let text = prompt("Título:");
+  if (!text) return;
+  blocks.push({ type: "title", data: text });
+  render();
+}
 
+function addImage() {
+  let url = prompt("URL imagen:");
+  if (!url) return;
   blocks.push({ type: "image", data: url });
   render();
 }
 
 function addButton() {
-  let text = prompt("Button text:");
+  let text = prompt("Texto botón:");
   if (!text) return;
 
-  let action = prompt("Action (link or JS):");
+  let action = prompt("Link o JS:");
   if (!action) action = "";
 
   blocks.push({
@@ -136,40 +156,65 @@ function addButton() {
   render();
 }
 
-function addHTML() {
-  let html = prompt("Paste HTML:");
-  if (!html) return;
+function addVideo() {
+  let url = prompt("URL embed video:");
+  if (!url) return;
+  blocks.push({ type: "video", data: url });
+  render();
+}
 
+function addDivider() {
+  blocks.push({ type: "divider" });
+  render();
+}
+
+function addHTML() {
+  let html = prompt("HTML:");
+  if (!html) return;
   blocks.push({ type: "html", data: html });
   render();
 }
 
 // ==========================
-// EDIT BLOCK
+// EDIT + PREMIUM
 // ==========================
 function editBlock(index) {
   const block = blocks[index];
 
-  if (block.type === "text") {
-    let newText = prompt("Edit text:", block.data);
+  let option = prompt(
+`Editar:
+1. Contenido normal
+2. Color (Premium 🔒)
+3. Tamaño (Premium 🔒)`
+  );
+
+  if (option === "2" || option === "3") {
+    if (!isPremium) {
+      alert("No eres premium 🚫");
+      return;
+    }
+  }
+
+  if (block.type === "text" || block.type === "title") {
+    let newText = prompt("Editar texto:", block.data);
     if (newText !== null) block.data = newText;
   }
 
   if (block.type === "image") {
-    let newUrl = prompt("Edit image URL:", block.data);
+    let newUrl = prompt("Editar URL:", block.data);
     if (newUrl !== null) block.data = newUrl;
   }
 
   if (block.type === "button") {
-    let newText = prompt("Edit button text:", block.data.text);
-    let newAction = prompt("Edit action:", block.data.action);
+    let newText = prompt("Texto:", block.data.text);
+    let newAction = prompt("Acción:", block.data.action);
 
     if (newText !== null) block.data.text = newText;
     if (newAction !== null) block.data.action = newAction;
   }
 
   if (block.type === "html") {
-    let newHtml = prompt("Edit HTML:", block.data);
+    let newHtml = prompt("Editar HTML:", block.data);
     if (newHtml !== null) block.data = newHtml;
   }
 
@@ -177,10 +222,10 @@ function editBlock(index) {
 }
 
 // ==========================
-// MOVE BLOCKS
+// MOVE
 // ==========================
-function moveBlock(index, direction) {
-  const newIndex = index + direction;
+function moveBlock(index, dir) {
+  const newIndex = index + dir;
   if (newIndex < 0 || newIndex >= blocks.length) return;
 
   [blocks[index], blocks[newIndex]] = [blocks[newIndex], blocks[index]];
@@ -188,34 +233,21 @@ function moveBlock(index, direction) {
 }
 
 // ==========================
-// GENERATE HTML
+// GENERATE
 // ==========================
 function generateHTML() {
   let html = "";
 
   blocks.forEach(block => {
-    if (block.type === "text") {
-      html += `<p>${block.data}</p>`;
-    }
-
-    if (block.type === "image") {
-      html += `<img src="${block.data}" style="max-width:100%">`;
-    }
+    if (block.type === "text") html += `<p>${block.data}</p>`;
+    if (block.type === "title") html += `<h2>${block.data}</h2>`;
+    if (block.type === "image") html += `<img src="${block.data}" style="max-width:100%">`;
+    if (block.type === "divider") html += `<hr>`;
+    if (block.type === "video") html += `<iframe src="${block.data}" width="100%" height="200"></iframe>`;
+    if (block.type === "html") html += block.data;
 
     if (block.type === "button") {
-      html += `
-<button onclick="
-if('${block.data.action}'.startsWith('http')){
-  window.open('${block.data.action}')
-}else{
-  try{new Function('${block.data.action}')()}
-  catch{alert('Error')}
-}
-">${block.data.text}</button>`;
-    }
-
-    if (block.type === "html") {
-      html += block.data;
+      html += `<button onclick="window.open('${block.data.action}')">${block.data.text}</button>`;
     }
   });
 
@@ -226,33 +258,25 @@ if('${block.data.action}'.startsWith('http')){
 // SAVE
 // ==========================
 function save() {
-  let name = prompt("Site name:");
+  let name = prompt("Nombre del sitio:");
   if (!name) return;
 
   let content = generateHTML();
-
   let sites = JSON.parse(localStorage.getItem("sites")) || [];
 
-  let existing = sites.find(s => s.name === name);
-
-  if (existing) {
-    existing.content = content;
-  } else {
-    sites.push({ name, content });
-  }
+  sites.push({ name, content });
 
   localStorage.setItem("sites", JSON.stringify(sites));
-
-  alert("Saved successfully ✅");
+  alert("Guardado ✅");
 }
 
 // ==========================
 // CLEAR
 // ==========================
 function clearCanvas() {
-  if (confirm("Clear everything?")) {
+  if (confirm("Borrar todo?")) {
     blocks = [];
     render();
   }
 }
-
+```
