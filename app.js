@@ -1,4 +1,4 @@
-```javascript id="final-fix"
+javascript id="final-fix"
 // ==========================
 // STATE
 // ==========================
@@ -175,5 +175,5 @@ function clearCanvas(){
     render();
   }
 }
-```
+
 
