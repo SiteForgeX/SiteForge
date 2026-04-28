@@ -1,15 +1,28 @@
-javascript
+javascript id="hyper-app"
 // ==========================
 // CONFIG
 // ==========================
 let blocks = [];
-let isPremium = false; // ← cambia a true si quieres activar premium
+let isPremium = false;
+
+// ==========================
+// INIT
+// ==========================
+window.onload = () => {
+  console.log("Editor listo ✅");
+  render();
+};
 
 // ==========================
 // RENDER
 // ==========================
 function render() {
   const canvas = document.getElementById("canvas");
+  if (!canvas) {
+    console.error("Canvas no encontrado");
+    return;
+  }
+
   canvas.innerHTML = "";
 
   blocks.forEach((block, index) => {
@@ -18,40 +31,40 @@ function render() {
 
     let content;
 
-    // TEXT
+    // ===== TEXT =====
     if (block.type === "text") {
       content = document.createElement("p");
       content.innerText = block.data;
     }
 
-    // TITLE
+    // ===== TITLE =====
     if (block.type === "title") {
       content = document.createElement("h2");
       content.innerText = block.data;
     }
 
-    // IMAGE
+    // ===== IMAGE =====
     if (block.type === "image") {
       content = document.createElement("img");
       content.src = block.data;
       content.style.maxWidth = "100%";
     }
 
-    // BUTTON
+    // ===== BUTTON =====
     if (block.type === "button") {
       content = document.createElement("button");
       content.innerText = block.data.text;
 
       content.onclick = () => {
-        const action = block.data.action || "";
+        let action = block.data.action;
 
         if (!action) {
-          alert("No action assigned");
+          alert("Sin acción");
           return;
         }
 
         if (action.startsWith("http")) {
-          window.open(action, "_blank");
+          window.open(action);
         } else {
           try {
             new Function(action)();
@@ -62,7 +75,7 @@ function render() {
       };
     }
 
-    // VIDEO
+    // ===== VIDEO =====
     if (block.type === "video") {
       content = document.createElement("iframe");
       content.src = block.data;
@@ -70,31 +83,37 @@ function render() {
       content.height = "200";
     }
 
-    // DIVIDER
+    // ===== DIVIDER =====
     if (block.type === "divider") {
       content = document.createElement("hr");
     }
 
-    // HTML
+    // ===== HTML =====
     if (block.type === "html") {
       content = document.createElement("div");
       content.innerHTML = block.data;
     }
 
+    // ===== STYLES =====
+    if (block.style) {
+      if (block.style.color) content.style.color = block.style.color;
+      if (block.style.size) content.style.fontSize = block.style.size + "px";
+    }
+
     div.appendChild(content);
 
     // ==========================
-    // CONTROLES
+    // CONTROLS
     // ==========================
 
     // EDIT
-    const edit = document.createElement("button");
+    let edit = document.createElement("button");
     edit.innerText = "✏️";
     edit.onclick = () => editBlock(index);
     div.appendChild(edit);
 
     // DELETE
-    const del = document.createElement("button");
+    let del = document.createElement("button");
     del.innerText = "❌";
     del.onclick = () => {
       blocks.splice(index, 1);
@@ -103,12 +122,12 @@ function render() {
     div.appendChild(del);
 
     // MOVE
-    const up = document.createElement("button");
+    let up = document.createElement("button");
     up.innerText = "⬆️";
     up.onclick = () => moveBlock(index, -1);
     div.appendChild(up);
 
-    const down = document.createElement("button");
+    let down = document.createElement("button");
     down.innerText = "⬇️";
     down.onclick = () => moveBlock(index, 1);
     div.appendChild(down);
@@ -123,6 +142,7 @@ function render() {
 function addText() {
   let text = prompt("Texto:");
   if (!text) return;
+
   blocks.push({ type: "text", data: text });
   render();
 }
@@ -130,6 +150,7 @@ function addText() {
 function addTitle() {
   let text = prompt("Título:");
   if (!text) return;
+
   blocks.push({ type: "title", data: text });
   render();
 }
@@ -137,6 +158,7 @@ function addTitle() {
 function addImage() {
   let url = prompt("URL imagen:");
   if (!url) return;
+
   blocks.push({ type: "image", data: url });
   render();
 }
@@ -157,8 +179,9 @@ function addButton() {
 }
 
 function addVideo() {
-  let url = prompt("URL embed video:");
+  let url = prompt("URL embed:");
   if (!url) return;
+
   blocks.push({ type: "video", data: url });
   render();
 }
@@ -171,6 +194,7 @@ function addDivider() {
 function addHTML() {
   let html = prompt("HTML:");
   if (!html) return;
+
   blocks.push({ type: "html", data: html });
   render();
 }
@@ -179,13 +203,13 @@ function addHTML() {
 // EDIT + PREMIUM
 // ==========================
 function editBlock(index) {
-  const block = blocks[index];
+  let block = blocks[index];
 
   let option = prompt(
 `Editar:
-1. Contenido normal
-2. Color (Premium 🔒)
-3. Tamaño (Premium 🔒)`
+1. Contenido
+2. Color 🔒 Premium
+3. Tamaño 🔒 Premium`
   );
 
   if (option === "2" || option === "3") {
@@ -195,27 +219,41 @@ function editBlock(index) {
     }
   }
 
-  if (block.type === "text" || block.type === "title") {
-    let newText = prompt("Editar texto:", block.data);
-    if (newText !== null) block.data = newText;
+  if (option === "1") {
+    if (block.type === "text" || block.type === "title") {
+      let t = prompt("Editar:", block.data);
+      if (t !== null) block.data = t;
+    }
+
+    if (block.type === "image") {
+      let u = prompt("URL:", block.data);
+      if (u !== null) block.data = u;
+    }
+
+    if (block.type === "button") {
+      let t = prompt("Texto:", block.data.text);
+      let a = prompt("Acción:", block.data.action);
+
+      if (t !== null) block.data.text = t;
+      if (a !== null) block.data.action = a;
+    }
+
+    if (block.type === "html") {
+      let h = prompt("HTML:", block.data);
+      if (h !== null) block.data = h;
+    }
   }
 
-  if (block.type === "image") {
-    let newUrl = prompt("Editar URL:", block.data);
-    if (newUrl !== null) block.data = newUrl;
+  if (option === "2") {
+    let color = prompt("Color (red, blue...):");
+    if (!block.style) block.style = {};
+    block.style.color = color;
   }
 
-  if (block.type === "button") {
-    let newText = prompt("Texto:", block.data.text);
-    let newAction = prompt("Acción:", block.data.action);
-
-    if (newText !== null) block.data.text = newText;
-    if (newAction !== null) block.data.action = newAction;
-  }
-
-  if (block.type === "html") {
-    let newHtml = prompt("Editar HTML:", block.data);
-    if (newHtml !== null) block.data = newHtml;
+  if (option === "3") {
+    let size = prompt("Tamaño (px):");
+    if (!block.style) block.style = {};
+    block.style.size = size;
   }
 
   render();
@@ -225,33 +263,11 @@ function editBlock(index) {
 // MOVE
 // ==========================
 function moveBlock(index, dir) {
-  const newIndex = index + dir;
+  let newIndex = index + dir;
   if (newIndex < 0 || newIndex >= blocks.length) return;
 
   [blocks[index], blocks[newIndex]] = [blocks[newIndex], blocks[index]];
   render();
-}
-
-// ==========================
-// GENERATE
-// ==========================
-function generateHTML() {
-  let html = "";
-
-  blocks.forEach(block => {
-    if (block.type === "text") html += `<p>${block.data}</p>`;
-    if (block.type === "title") html += `<h2>${block.data}</h2>`;
-    if (block.type === "image") html += `<img src="${block.data}" style="max-width:100%">`;
-    if (block.type === "divider") html += `<hr>`;
-    if (block.type === "video") html += `<iframe src="${block.data}" width="100%" height="200"></iframe>`;
-    if (block.type === "html") html += block.data;
-
-    if (block.type === "button") {
-      html += `<button onclick="window.open('${block.data.action}')">${block.data.text}</button>`;
-    }
-  });
-
-  return html;
 }
 
 // ==========================
@@ -261,13 +277,36 @@ function save() {
   let name = prompt("Nombre del sitio:");
   if (!name) return;
 
-  let content = generateHTML();
-  let sites = JSON.parse(localStorage.getItem("sites")) || [];
+  let html = generateHTML();
 
-  sites.push({ name, content });
+  let sites = JSON.parse(localStorage.getItem("sites")) || [];
+  sites.push({ name, content: html });
 
   localStorage.setItem("sites", JSON.stringify(sites));
+
   alert("Guardado ✅");
+}
+
+// ==========================
+// GENERATE HTML
+// ==========================
+function generateHTML() {
+  let html = "";
+
+  blocks.forEach(b => {
+    if (b.type === "text") html += `<p>${b.data}</p>`;
+    if (b.type === "title") html += `<h2>${b.data}</h2>`;
+    if (b.type === "image") html += `<img src="${b.data}">`;
+    if (b.type === "divider") html += `<hr>`;
+    if (b.type === "video") html += `<iframe src="${b.data}"></iframe>`;
+    if (b.type === "html") html += b.data;
+
+    if (b.type === "button") {
+      html += `<button onclick="window.open('${b.data.action}')">${b.data.text}</button>`;
+    }
+  });
+
+  return html;
 }
 
 // ==========================
@@ -279,4 +318,4 @@ function clearCanvas() {
     render();
   }
 }
-
+ 
