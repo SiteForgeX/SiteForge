@@ -1,4 +1,4 @@
-```javascript
+javascript
 // ==========================
 // CONFIG
 // ==========================
@@ -279,4 +279,4 @@ function clearCanvas() {
     render();
   }
 }
-```
+
